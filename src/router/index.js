@@ -96,6 +96,19 @@ const routes = [
           }
           next('/login')
         }
+      },
+      {
+        path: 'blacklist',
+        name: 'BlacklistView',
+        component: () => import('@/views/BlacklistView'),
+        beforeEnter: (to, from, next) => {
+          const role = getUserRole()
+          if (role === 1) {
+            next()
+            return
+          }
+          next('/login')
+        }
       }
     ]
   },

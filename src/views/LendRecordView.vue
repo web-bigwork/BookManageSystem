@@ -47,6 +47,7 @@
       <el-table-column prop="bookname" label="图书名称" />
       <el-table-column prop="readerName" label="借阅者" sortable/>
       <el-table-column prop="lendTime" label="借出时间" sortable/>
+      <el-table-column prop="deadtime" label="应归还时间" sortable/>
       <el-table-column prop="returnTime" label="实际还书时间" sortable/>
       <el-table-column label="可借次数">
         <template v-slot="scope">
@@ -228,8 +229,21 @@ export default defineComponent({
         }
       }).then(res =>{
         console.log(res)
-        this.tableData = res.data.records
-        this.total = res.data.total
+        // 字段映射：后端字段 -> 前端字段
+        const listData = res.data.records || res.data.rows || []
+        this.tableData = listData.map(item => ({
+          id: item.id,
+          readerId: item.user_id, // 映射 user_id -> readerId
+          readerName: item.username || item.user_name || `用户${item.user_id}`, // 用户名
+          bookname: item.book_title || item.book_name || `书籍${item.book_id}`, // 书名
+          isbn: item.isbn || item.book_isbn || '',
+          lendTime: item.borrow_date, // 映射 borrow_date -> lendTime
+          deadtime: item.due_date, // 映射 due_date -> deadtime
+          returnTime: item.return_date || '', // 实际还书时间
+          status: item.return_date ? 1 : 0, // 有还书时间则为已还(1)，否则为在借(0)
+          prolong: item.prolong_count || 0 // 续借次数
+        }))
+        this.total = res.data.total || listData.length
       })
     },
     save(isbn){
@@ -291,6 +305,8 @@ export default defineComponent({
             ElMessage.error(res.msg)
           }
 
+          // 强制刷新数据，确保清除缓存
+          this.currentPage = 1
           this.load() //不知道为啥，更新必须要放在这里面
           this.dialogVisible2 = false
         })

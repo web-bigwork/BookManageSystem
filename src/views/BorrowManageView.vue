@@ -61,6 +61,14 @@
       <el-table-column fixed="right" label="操作" >
         <template v-slot="scope">
           <el-button  size="mini" @click ="handleEdit(scope.row)">修改</el-button>
+          <el-popconfirm
+            v-if="user.role == 1 && scope.row.status == 1"
+            title="确认撤销还书？"
+            @confirm="handleUndoReturn(scope.row)">
+            <template #reference>
+              <el-button type="warning" size="mini">撤销还书</el-button>
+            </template>
+          </el-popconfirm>
           <el-popconfirm title="确认删除?" @confirm="handleDelete(scope.row) ">
             <template #reference>
               <el-button type="danger" size="mini" >删除</el-button>
@@ -418,6 +426,27 @@ export default {
     handleEdit(row){
       this.form = JSON.parse(JSON.stringify(row))
       this.dialogVisible2 = true
+    },
+    handleUndoReturn(row) {
+      if (!row.id) {
+        ElMessage.error("记录ID异常")
+        return
+      }
+
+      const payload = { id: Number(row.id), status: 0 }
+      request.post('/borrow/update', payload).then(res => {
+        if (res.code === 1) {
+          ElMessage.success(res.msg || '已撤销还书，状态恢复在借')
+          this.load()
+          return
+        }
+        ElMessage.error(res.msg || '撤销失败')
+      }).catch(err => {
+        const status = err?.response?.status
+        const serverMsg = err?.response?.data?.msg
+        console.error('撤销失败:', err)
+        ElMessage.error(`撤销失败（HTTP ${status || ''}）：${serverMsg || '请稍后重试'}`)
+      })
     },
     onStatusChange(val){
       if (Number(val) === 0) {

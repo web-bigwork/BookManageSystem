@@ -2,6 +2,20 @@ const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
+    client: {
+      overlay: {
+        errors: true,
+        warnings: false,
+        runtimeErrors: (error) => {
+          // 忽略 ResizeObserver 相关错误
+          const ignoreErrors = [
+            'ResizeObserver loop completed with undelivered notifications',
+            'ResizeObserver loop limit exceeded'
+          ]
+          return !ignoreErrors.some(msg => error.message.includes(msg))
+        }
+      }
+    },
     proxy: {
       // 前端 axios 里所有以 /api 开头的请求，都会被转发到后端 Spring Boot
       '/api': {

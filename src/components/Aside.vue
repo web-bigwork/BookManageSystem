@@ -39,6 +39,12 @@
       </svg>
       <span>借阅管理</span>
     </el-menu-item>
+    <el-menu-item index="/blacklist" v-if="user.role == 1">
+      <svg class="icon" aria-hidden="true">
+        <use xlink:href="#iconreader "></use>
+      </svg>
+      <span>黑名单</span>
+    </el-menu-item>
     <el-menu-item index="/borrow-search" v-if="user.role === 0">
       <svg class="icon" aria-hidden="true">
         <use xlink:href="#iconlend-record"></use>
