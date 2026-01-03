@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkbook"]=self["webpackChunkbook"]||[]).push([[406],{5406:function(t,a,r){r.d(a,{isUserInBlacklist:function(){return e}});var n=r(5067);async function e(t){if(!t)return!1;try{const a=await n.A.get(`/blacklist/user/${t}/details`);return!!(a&&1===a.code&&a.data&&Array.isArray(a.data)&&a.data.length>0)}catch(a){return!1}}}}]);
+//# sourceMappingURL=406.9aafaacc.js.map

@@ -28,13 +28,7 @@
       </el-form>
     </div>
     <!-- 按钮-->
-    <div style="margin: 10px 0;" >
-      <el-popconfirm title="确认删除?" @confirm="deleteBatch" v-if="user.role == 1">
-        <template #reference>
-          <el-button type="danger" size="mini" >批量删除</el-button>
-        </template>
-      </el-popconfirm>
-    </div>
+    
     <!-- 数据字段-->
     <el-table :data="tableData" stripe border="true" @selection-change="handleSelectionChange">
       <el-table-column v-if="user.role ==1"
@@ -115,7 +109,8 @@
           </el-form-item>
           <el-form-item label="借阅状态">
             <el-radio-group v-model.number="form.status" @change="onStatusChange">
-              <el-radio :label="0">已还</el-radio>
+              <el-radio :label="0">在借</el-radio>
+              <el-radio :label="1">已还</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-form>

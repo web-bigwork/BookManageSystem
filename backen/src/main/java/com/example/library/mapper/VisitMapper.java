@@ -12,6 +12,9 @@ public interface VisitMapper {
 
     @Insert("INSERT INTO visit_count(id, `count`) VALUES(1,1) ON DUPLICATE KEY UPDATE `count` = `count` + 1")
     int incrementVisit();
+
+    @Insert("INSERT IGNORE INTO visit_count(id, `count`) VALUES(1, 0)")
+    int initVisitCount();
 }
 
 

@@ -48,6 +48,8 @@ public class DashController {
 
         int visitCount = 0;
         try {
+            // 确保visit_count表中有记录
+            visitMapper.initVisitCount();
             Integer cnt = visitMapper.getCount();
             visitCount = (cnt != null) ? cnt : 0;
         } catch (Exception ignored) {
@@ -65,8 +67,12 @@ public class DashController {
     @GetMapping("/visit")
     public Result recordVisit() {
         try {
+            // 确保visit_count表中有记录
+            visitMapper.initVisitCount();
             visitMapper.incrementVisit();
+            System.out.println("访问记录成功");
         } catch (Exception e) {
+            System.err.println("记录访问失败: " + e.getMessage());
             return Result.error("记录访问失败");
         }
         return Result.success();

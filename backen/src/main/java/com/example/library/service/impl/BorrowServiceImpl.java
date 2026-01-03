@@ -13,6 +13,7 @@ import com.example.library.service.BorrowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -200,6 +201,14 @@ public class BorrowServiceImpl implements BorrowService {
                 // 设置为当前时间 + 1天
                 record.setDue_date(LocalDateTime.now().plusDays(1));
                 System.out.println("editRecord: 撤销还书，清除归还时间，自动设置到期时间为: " + record.getDue_date());
+            }
+        }
+        // 如果是从在借改为已还，需要设置归还时间
+        else if (oldStatus != null && oldStatus == 0 && newStatus != null && newStatus == 1) {
+            // 设置归还时间为当前时间，如果前端没有提供的话
+            if (record.getReturnTime() == null) {
+                record.setReturnTime(new java.util.Date());
+                System.out.println("editRecord: 还书成功，设置归还时间为: " + record.getReturnTime());
             }
         }
 
@@ -457,14 +466,20 @@ public class BorrowServiceImpl implements BorrowService {
     }
 
     @Override
+    @Transactional
     public Result removeFromBlacklist(Long userId) {
         if (userId == null) {
             return Result.error("用户ID不能为空");
         }
 
+        // 先将该用户的所有逾期记录改为已还状态
+        int overdueUpdated = borrowRecordMapper.updateOverdueRecordsToReturned(userId);
+        System.out.println("移除黑名单：用户 " + userId + " 的 " + overdueUpdated + " 条逾期记录已改为已还状态");
+
+        // 移除黑名单记录
         int rows = blacklistMapper.removeByUserId(userId);
         if (rows > 0) {
-            return Result.success("已成功移出黑名单");
+            return Result.success("已成功移出黑名单，共处理了 " + overdueUpdated + " 条逾期记录");
         } else {
             return Result.error("用户不在黑名单中或操作失败");
         }

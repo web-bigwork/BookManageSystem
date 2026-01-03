@@ -45,11 +45,6 @@
     <!-- 按钮-->
     <div style="margin: 10px 0;" >
       <el-button type="primary" size="mini" @click = "add" v-if="user.role === 1" style="margin-right: 10px">上架</el-button>
-      <el-popconfirm title="确认删除?" @confirm="deleteBatch" v-if="user.role === 1">
-        <template #reference>
-          <el-button type="danger" size="mini" >批量删除</el-button>
-        </template>
-      </el-popconfirm>
     </div>
     <!-- 数据字段-->
     <el-table :data="tableData" stripe border="true" @selection-change="handleSelectionChange">

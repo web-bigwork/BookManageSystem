@@ -121,7 +121,17 @@ export default {
                 localStorage.setItem("username", userObj.username)
               }
               ElMessage.success(res.msg || "登录成功")
-              this.$router.push("/dashboard")
+              console.log('登录成功，开始记录访问')
+
+              // 登录成功后记录访问
+              request.get("/visit").then(res => {
+                console.log('访问记录成功:', res)
+              }).catch(err => {
+                console.warn('记录访问失败：', err)
+              }).finally(() => {
+                console.log('准备跳转到仪表板')
+                this.$router.push("/dashboard")
+              })
             } else {
               ElMessage.error(res.msg || "登录失败")
             }

@@ -65,7 +65,7 @@ public interface BorrowRecordMapper {
             "JOIN book b ON br.book_id = b.id " +
             "JOIN user u ON br.user_id = u.id " +
             "WHERE br.status = 1 " +
-            "ORDER BY br.file:///D:/xwechat_files/wxid_udcqbpcwizxk22_3a3f/temp/RWTemp/2025-12/6c56496ca449822ea3ac100bd34c126f/library.sql DESC " +
+            "ORDER BY br.return_date DESC " +
             "LIMIT #{start}, #{pageSize}")
     List<Map<String, Object>> selectAllReturned(@Param("start") int start,
                                                 @Param("pageSize") int pageSize);
@@ -126,7 +126,7 @@ public interface BorrowRecordMapper {
             "<set>" +
             "<if test='status != null'>status = #{status},</if>" +
             "<if test='dueDate != null'>due_date = #{dueDate},</if>" +
-            "return_date = #{returnTime}," +
+            "<if test='returnTime != null'>return_date = #{returnTime},</if>" +
             "</set>" +
             "WHERE id = #{id} AND (isDelete IS NULL OR isDelete = 0)" +
             "</script>")
@@ -137,6 +137,12 @@ public interface BorrowRecordMapper {
 
     @Update("UPDATE borrow_record SET status = #{status} WHERE id = #{id} AND (isDelete IS NULL OR isDelete = 0)")
     int updateStatusById(@Param("id") Long id, @Param("status") Integer status);
+
+    /**
+     * 将指定用户的所有逾期记录（status=2）改为已还状态（status=1），并设置归还时间
+     */
+    @Update("UPDATE borrow_record SET status = 1, return_date = NOW() WHERE user_id = #{userId} AND status = 2 AND (isDelete IS NULL OR isDelete = 0)")
+    int updateOverdueRecordsToReturned(@Param("userId") Long userId);
 
 //    @Update("UPDATE borrow_record SET user_id = #{userId}, book_id = #{bookId}, borrow_date = #{borrow_date}, due_date = #{due_date}, return_date = #{return_date}, status = #{status} WHERE id = #{id}")
 //    int updateById(BorrowRecord record);
